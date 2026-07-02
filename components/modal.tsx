@@ -3,16 +3,10 @@ import { useState } from 'react';
 
 import Toast from 'react-native-toast-message';
 
-import Constants from "expo-constants";
 import { Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 
-
-
-
-
-const host = Constants.expoConfig?.hostUri?.split(":")[0];
-const API_URL = `http://${host}:8000/Api/`;
+const API_URL = `https://backend-apib.onrender.com/Api/`;
 
 interface Rio {
   id: string;

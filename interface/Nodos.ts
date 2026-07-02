@@ -18,7 +18,7 @@ export type Nodo = {
   name: string;
   installed_at: string;
   red: number;
-  ultima_metrica: Metrica;
+  ultima_metrica: Metrica | null;
   locations: Location[];
 };
 
@@ -34,4 +34,15 @@ export type Red = {
 export type Rio = {
   id: string;
   name: string;
+}
+
+
+
+
+export type Warnings_node = {
+  id: number;
+  nodo: number;
+  message: string;
+  status: boolean;
+  created_at: string;
 }

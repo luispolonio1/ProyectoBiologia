@@ -13,14 +13,12 @@ import { useFetch } from '@/hooks/useFetch';
 
 import { ModalView } from '@/components/modal';
 import { ScreenWrapper } from '@/components/SafeAreaPerson';
+import { Warnings } from '@/components/Warnings';
 import { useRed } from '@/context/RedContext';
 import { Red, Rio } from '@/interface/Nodos';
 
-import Constants from "expo-constants";
 
-
-const host = Constants.expoConfig?.hostUri?.split(":")[0];
-const API_URL = `http://${host}:8000/Api/`;
+const API_URL = `https://backend-apib.onrender.com/Api/`;
 
 
 export default function Inicio() {
@@ -42,14 +40,23 @@ export default function Inicio() {
       setItemsRedes(redes);
     }
   }, [data]);
-
+  console.log(data)
   // ✅ Cada vez que cambia el value, actualiza el contexto global
-  useEffect(() => {
-    if (data && value !== null) {
-      const red = data?.find(red => red.id === value) || null;
-      setRedSeleccionada(red);
-    }
-  }, [value, data]);
+useEffect(() => {
+  if (!data || value === null) return;
+
+  const redActualizada =
+    data.find(red => red.id === value) || null;
+
+  console.log(
+    "Nueva métrica:",
+    redActualizada?.nodos?.[0]?.ultima_metrica
+  );
+
+  setRedSeleccionada({
+    ...redActualizada!
+  });
+}, [data, value]);
 
 
 const nodos = redSeleccionada?.nodos || [];
@@ -61,6 +68,24 @@ useEffect(() => {
     .catch(err => console.error('Error:', err))
     .finally(() => setLoadingrios(false));
 }, []);
+
+
+useEffect(() => {
+  if (!redSeleccionada) return;
+  const interval = setInterval(() => {
+    console.log(` YA paso el Tiempo : ${redSeleccionada.sync_seconds} seg`)
+    refetch();
+  }, redSeleccionada.sync_seconds * 1000);
+  console.log(`Datos de la red seleccionada : ${redSeleccionada.name}`)
+  console.log(JSON.stringify(redSeleccionada, null, 2));
+
+  return () => clearInterval(interval);
+}, [redSeleccionada?.id, redSeleccionada?.sync_seconds]);
+
+
+{/* falata implementar modelo warnings en DRF para incluirlo en el contexto global de la aplicacion */}
+const Warnings_nodo:any = [
+]
 
   return (
     <ScreenWrapper>
@@ -98,13 +123,10 @@ useEffect(() => {
 
 
           </View>
-
-
-
           {/* Cajas de informacion */}
           <View className=' flex-row justify-between'>
             <InfoBox iconName={'notifications'} name='Nodos Activos' infoNumber={`${redSeleccionada?.nodos.length}`} colorBox='bg-blue-500'colorText='color-blue-500'/>
-            <InfoBox iconName={'warning-outline'} name='Alertas Críticas' infoNumber={'1'} colorBox='bg-orange-500'colorText='color-orange-500'/>
+            <InfoBox iconName={'warning-outline'} name='Alertas Críticas' infoNumber={'1'} colorBox='bg-red-500'colorText='color-red-500'/>
           </View>
           <View>
               <InfoBox iconName={'time'} name='Última Sincronización' infoNumber={`Hace ${redSeleccionada?.sync_seconds} seg`} colorBox='bg-emerald-800' colorText='color-emerald-800' wtamanio='w-full'/>
@@ -112,7 +134,17 @@ useEffect(() => {
 
 
           {/* Caja informativa de Red seleccionada Nombre , estado y Rio */}
-          <View className='flex-1 border rounded-xl w-full mt-3 border-gray-400'>
+          <View className='flex-1 border rounded-xl w-full mt-3 border-gray-400 bg-white'
+                  style={{
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.07,
+                shadowRadius: 6,
+                elevation: 2,
+                borderWidth: 1,
+                borderColor: '#f1f5f9',
+      }} 
+          >
 
             
             <View className='flex-row items-center justify-between w-full m-2'>
@@ -146,22 +178,35 @@ useEffect(() => {
         tener una caja vacia cuando este sin alertas
         */}
 
-
-      <View className='flex-1 border rounded-xl w-full mt-3 border-orange-600 bg-orange-50'>
-          <View className='m-2 flex-row items-center '>
-            <Ionicons name='warning-outline' size={24} color={'#FF7E00'}/>
-            <Text className='color-orange-500 ml-2'>Alertas Críticas Activas</Text>
-          </View>
-          <View className='m-3 bg-slate-50 rounded-xl p-3'>
-              <View className='flex-row justify-between'>
-                    <Text className='text-xl font-semibold'>Nodo Oeste</Text>
-                    <Text className='color-zinc-400' style={{fontFamily:'Altone'}}>Hace 1h</Text>
-              </View>
-              <Text className='color-zinc-400 font-extralight' >pH fuera de rango normal</Text>
-          </View>
-      </View>
-
-
+{
+  Warnings_nodo?.length > 0 ? (
+    Warnings_nodo.map(warning => (
+      <Warnings
+        key={warning.id}
+        id={warning.id}
+        
+        nodo={warning.nodo}
+        message={warning.message}
+        status={warning.status}
+        created_at={warning.created_at}
+      />
+    ))
+  ) : (
+    <View className='items-center justify-center mt-5 border border-red-600 p-5 bg-red-50 rounded-xl w-full h-48'>
+      <Ionicons
+        name='warning-outline'
+        size={32}
+        color={'#ef4444'}
+      />
+      <Text className='color-red-500'>
+        No hay Alertas Críticas Activas
+      </Text>
+      <Text className='color-red-500'>
+        Todas las Alertas están Resueltas
+      </Text>
+    </View>
+  )
+}
       {/* Estado de los Nodos de Red Actual */} 
               <View className='mt-4'>
                 <Text className='text-xl font-extrabold'>Estado de Todos los Nodos</Text>

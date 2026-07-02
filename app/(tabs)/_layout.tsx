@@ -24,9 +24,15 @@ export default function TabLayout() {
   })
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider
+    
+    >
     <RedProvider>
-    <StatusBar barStyle='dark-content'/>
+    <StatusBar 
+        barStyle='dark-content'
+        backgroundColor="#ffffff"
+        translucent={false}
+        />
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#8AE393',

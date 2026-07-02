@@ -29,6 +29,37 @@ export function InfoNodos({
   ultima_metrica,
   locations,
 }: Nodo) {
+
+  if (!ultima_metrica) {
+    return (
+      <TouchableOpacity
+        style={{
+          backgroundColor: '#fff',
+          borderRadius: 16,
+          padding: 14,
+          marginTop: 12,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.07,
+          shadowRadius: 6,
+          elevation: 2,
+          borderWidth: 1,
+          borderColor: '#f1f5f9',
+        }}
+        onPress={() => router.push({ pathname: '/Nodos/InformacionNodo', params: { nodoId: name } })}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View style={{ backgroundColor: '#f1f5f9', borderRadius: 10, padding: 8 }}>
+            <Ionicons name="wifi-outline" size={20} color="#94a3b8" />
+          </View>
+          <View>
+            <Text style={{ fontSize: 16, fontWeight: '600', color: '#0f172a' }}>{name}</Text>
+            <Text style={{ fontSize: 12, color: '#94a3b8', marginTop: 1 }}>Sin métricas aún</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
   const { status, signal, bateria, time } = ultima_metrica;
   const { label: signalLabel, color: signalColor } = getSignalLabel(signal);
   const dbm = getSignalDbm(signal);
