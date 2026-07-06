@@ -53,7 +53,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="Inicio/index"
+        name="index"
         options={{
           title: 'Inicio',
 

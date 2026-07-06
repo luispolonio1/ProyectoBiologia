@@ -1,6 +1,6 @@
 // app/informacionNodo.tsx
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import { sendMotorCommand } from "../../../lib/api";
 import type { CommandResult, MotorAction } from "../../../type/motor";
+import type { Metrica, Red } from "../../../interface/Nodos";
+import { ENDPOINTS } from "../../../lib/config";
 
 interface ActionConfig {
   key: MotorAction;
@@ -24,19 +26,54 @@ const ACTIONS: readonly ActionConfig[] = [
   { key: "LEFT",     label: "Encender", color: "bg-sky-500"     },
 ] as const;
 
+// ⚠️ Misma constante que el resto del proyecto — centralizada en lib/config.ts
+const API_URL = ENDPOINTS.redes;
+
+// Duración por defecto en ms (50 segundos coincide con la app del operador)
+const DEFAULT_DURATION_MS = 50000;
+
 export default function InformacionNodo() {
-  const { nodoId } = useLocalSearchParams<{ nodoId: string }>();
+  const { nodoId, deviceId } = useLocalSearchParams<{ nodoId: string; deviceId?: string }>();
   const [sending, setSending] = useState<MotorAction | null>(null);
   const [lastCmd, setLastCmd] = useState<CommandResult | null>(null);
+  const [metric, setMetric] = useState<Metrica | null>(null);
+  const [loadingMetric, setLoadingMetric] = useState(true);
+
+  // Carga la última métrica del nodo desde la lista de redes
+  const fetchMetric = useCallback(async () => {
+    try {
+      setLoadingMetric(true);
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const redes = (await res.json()) as Red[];
+      for (const red of redes) {
+        const found = red.nodos?.find((n) => n.name === nodoId);
+        if (found?.ultima_metrica) {
+          setMetric(found.ultima_metrica);
+          return;
+        }
+      }
+      setMetric(null);
+    } catch {
+      setMetric(null);
+    } finally {
+      setLoadingMetric(false);
+    }
+  }, [nodoId]);
+
+  useEffect(() => {
+    fetchMetric();
+  }, [fetchMetric]);
 
   const handleCommand = useCallback(
     async (action: MotorAction): Promise<void> => {
       try {
         setSending(action);
         const result = await sendMotorCommand({
-          deviceId: nodoId,
+          // ⚠️ Antes se mandaba el "name" del nodo; ahora el device_id del ESP32
+          deviceId: deviceId && deviceId.length > 0 ? deviceId : nodoId,
           action,
-          durationMs: 1000,
+          durationMs: DEFAULT_DURATION_MS,
         });
         setLastCmd({ action, at: new Date(), id: result.id });
       } catch (err: unknown) {
@@ -47,7 +84,7 @@ export default function InformacionNodo() {
         setSending(null);
       }
     },
-    [nodoId],
+    [nodoId, deviceId],
   );
 
   return (
@@ -63,10 +100,96 @@ export default function InformacionNodo() {
         <View className="bg-white rounded-2xl p-4 mb-5 shadow-sm">
           <Text className="text-xs uppercase text-slate-400">Nodo</Text>
           <Text className="text-2xl font-bold text-slate-800">{nodoId}</Text>
-          <Text className="text-sm text-slate-500 mt-1">
-            Estado:{" "}
-            <Text className="text-emerald-600 font-semibold">conectado</Text>
-          </Text>
+          <View className="flex-row items-center mt-2 gap-3">
+            <View className="bg-slate-100 rounded-lg px-2 py-1">
+              <Text className="text-xs text-slate-600">
+                Device ID:{" "}
+                <Text className="font-mono font-semibold text-slate-800">
+                  {deviceId && deviceId.length > 0 ? deviceId : "—"}
+                </Text>
+              </Text>
+            </View>
+            <Text className="text-sm text-slate-500">
+              Estado:{" "}
+              <Text className="text-emerald-600 font-semibold">conectado</Text>
+            </Text>
+          </View>
+        </View>
+
+        {/* Tarjeta de sensores ambientales */}
+        <View className="bg-white rounded-2xl p-4 mb-5 shadow-sm">
+          <View className="flex-row justify-between items-center mb-3">
+            <Text className="text-xs uppercase text-slate-400">
+              Sensores ambientales
+            </Text>
+            {loadingMetric ? (
+              <ActivityIndicator size="small" color="#64748b" />
+            ) : (
+              <Pressable onPress={fetchMetric} hitSlop={8}>
+                <Text className="text-xs text-sky-600 font-medium">
+                  Actualizar
+                </Text>
+              </Pressable>
+            )}
+          </View>
+
+          {!loadingMetric && !metric ? (
+            <Text className="text-sm text-slate-400">
+              Aún no hay métricas registradas para este nodo.
+            </Text>
+          ) : metric ? (
+            <View className="flex-row justify-between">
+              <View>
+                <Text className="text-xs text-slate-400 mb-1">Temperatura</Text>
+                <Text className="text-3xl font-bold text-slate-800">
+                  {metric.temperatura == null
+                    ? "—"
+                    : `${metric.temperatura.toFixed(1)}°`}
+                </Text>
+                <Text className="text-xs text-slate-400 mt-0.5">Celsius</Text>
+              </View>
+              <View style={{ alignItems: "flex-end" }}>
+                <Text className="text-xs text-slate-400 mb-1">Humedad</Text>
+                <Text className="text-3xl font-bold text-sky-600">
+                  {metric.humedad == null
+                    ? "—"
+                    : `${metric.humedad.toFixed(0)}%`}
+                </Text>
+                <Text className="text-xs text-slate-400 mt-0.5">
+                  Relativa
+                </Text>
+              </View>
+            </View>
+          ) : null}
+
+          {metric && (
+            <View className="flex-row justify-between mt-4 pt-3 border-t border-slate-100">
+              <View>
+                <Text className="text-[10px] text-slate-400 uppercase">
+                  Señal
+                </Text>
+                <Text className="text-sm font-semibold text-slate-700">
+                  {metric.signal}%
+                </Text>
+              </View>
+              <View>
+                <Text className="text-[10px] text-slate-400 uppercase">
+                  Batería
+                </Text>
+                <Text className="text-sm font-semibold text-slate-700">
+                  {metric.bateria}%
+                </Text>
+              </View>
+              <View>
+                <Text className="text-[10px] text-slate-400 uppercase">
+                  Última sync
+                </Text>
+                <Text className="text-sm font-semibold text-slate-700">
+                  {new Date(metric.created_at).toLocaleTimeString()}
+                </Text>
+              </View>
+            </View>
+          )}
         </View>
 
         {lastCmd && (

@@ -4,6 +4,8 @@ export type Metrica = {
   bateria: number;
   created_at: string;
   time: number;
+  temperatura: number | null;
+  humedad: number | null;
 };
 
 export type Location = {
@@ -18,6 +20,7 @@ export type Nodo = {
   name: string;
   installed_at: string;
   red: number;
+  device_id: string;
   ultima_metrica: Metrica | null;
   locations: Location[];
 };

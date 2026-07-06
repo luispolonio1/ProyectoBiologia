@@ -1,8 +1,8 @@
 import { Picker } from '@react-native-picker/picker';
 import { useState } from 'react';
 import { Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import MapView, { MapPressEvent, Marker } from 'react-native-maps';
 import Toast from 'react-native-toast-message';
+import { MapLibreView, MapPressEvent } from './MapLibreView';
 
 const API_URL = `https://backend-apib.onrender.com/Api/nodos/`;
 
@@ -208,7 +208,7 @@ export const ModalViewNodo = ({ Redes }: { Redes: { label: string; value: number
               )}
 
               <View className="rounded-2xl overflow-hidden mb-4" style={{ height: 220 }}>
-                <MapView
+                <MapLibreView
                   style={{ flex: 1 }}
                   initialRegion={{
                     latitude: -2.1894,    // Milagro, Guayas
@@ -216,14 +216,14 @@ export const ModalViewNodo = ({ Redes }: { Redes: { label: string; value: number
                     latitudeDelta: 0.1,
                     longitudeDelta: 0.1,
                   }}
-                  onPress={handleMapPress}>
-                  {form.location && (
-                    <Marker
-                      coordinate={form.location}
-                      title="Nuevo nodo"
-                    />
-                  )}
-                </MapView>
+                  markers={
+                    form.location
+                      ? [{ latitude: form.location.latitude, longitude: form.location.longitude, title: 'Nuevo nodo', color: '#22c55e' }]
+                      : []
+                  }
+                  onPress={handleMapPress}
+                  styleUrl="https://tiles.openfreemap.org/styles/liberty"
+                />
               </View>
 
               {/* ── Botones ── */}

@@ -21,7 +21,7 @@ import { Red, Rio } from '@/interface/Nodos';
 const API_URL = `https://backend-apib.onrender.com/Api/`;
 
 
-export default function Inicio() {
+export default function Index() {
   const { redSeleccionada, setRedSeleccionada } = useRed();
 
   const { data, loading, error,refetch } = useFetch<Red[]>(
@@ -146,7 +146,7 @@ const Warnings_nodo:any = [
       }} 
           >
 
-            
+
             <View className='flex-row items-center justify-between w-full m-2'>
                 <Text className='text-lg' style={{fontFamily:'Altone'}}>{redSeleccionada?.name}</Text>
                 <View className='flex-row justify-center items-center mr-5 bg-emerald-800 p-2 rounded-lg w-28'>
@@ -157,7 +157,7 @@ const Warnings_nodo:any = [
 
           <Text className='color-zinc-400 m-2'>{`${redSeleccionada?.name ? redSeleccionada.name:'Red'}`}</Text>
 
-          
+
           <View className='flex-row items-center justify-between w-full m-2'>
               <View>
                   <Text className='color-zinc-400'>Río</Text>
@@ -174,7 +174,8 @@ const Warnings_nodo:any = [
 
 
 
-        {/* Caja de alertas esto es solo un ejemplo ya que se va a manejar de diferente forma ademas de 
+
+        {/* Caja de alertas esto es solo un ejemplo ya que se va a manejar de diferente forma ademas de
         tener una caja vacia cuando este sin alertas
         */}
 
@@ -184,7 +185,7 @@ const Warnings_nodo:any = [
       <Warnings
         key={warning.id}
         id={warning.id}
-        
+
         nodo={warning.nodo}
         message={warning.message}
         status={warning.status}
@@ -207,10 +208,10 @@ const Warnings_nodo:any = [
     </View>
   )
 }
-      {/* Estado de los Nodos de Red Actual */} 
+      {/* Estado de los Nodos de Red Actual */}
               <View className='mt-4'>
                 <Text className='text-xl font-extrabold'>Estado de Todos los Nodos</Text>
-                
+
                       {!nodos || nodos.length === 0 ? (
                         <View className='items-center justify-center mt-5 border border-emerald-900 p-5 bg-emerald-800 rounded-xl w-full h-48'>
                           <Ionicons name='map-outline' size={32} color={'#6ee7b7'}/>
@@ -231,7 +232,7 @@ const Warnings_nodo:any = [
                         ))
                       )}
                 </View>
-        </View> 
+        </View>
         </ScreenWrapper>
   );
 }

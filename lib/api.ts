@@ -3,12 +3,7 @@ import type {
     MotorAction,
     MotorCommandResponse,
 } from "../type/motor";
-
-const BASE = "https://backend-apib.onrender.com/Api/";
-
-if (!BASE) {
-  console.warn("EXPO_PUBLIC_API_URL no está definida");
-}
+import { ENDPOINTS } from "./config";
 
 export interface SendMotorCommandArgs {
   deviceId: string;
@@ -23,7 +18,7 @@ export async function sendMotorCommand({
   durationMs = 1000,
   token,
 }: SendMotorCommandArgs): Promise<MotorCommandResponse> {
-  const res = await fetch(`${BASE}/motor/command/`, {
+  const res = await fetch(ENDPOINTS.motorCommand, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

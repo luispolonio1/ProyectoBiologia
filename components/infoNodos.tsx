@@ -26,6 +26,7 @@ function getBateriaColor(bateria: number): string {
 
 export function InfoNodos({
   name,
+  device_id,
   ultima_metrica,
   locations,
 }: Nodo) {
@@ -46,7 +47,10 @@ export function InfoNodos({
           borderWidth: 1,
           borderColor: '#f1f5f9',
         }}
-        onPress={() => router.push({ pathname: '/Nodos/InformacionNodo', params: { nodoId: name } })}>
+        onPress={() => router.push({
+          pathname: '/Nodos/InformacionNodo',
+          params: { nodoId: name, deviceId: device_id ?? '' },
+        })}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <View style={{ backgroundColor: '#f1f5f9', borderRadius: 10, padding: 8 }}>
             <Ionicons name="wifi-outline" size={20} color="#94a3b8" />
@@ -60,7 +64,7 @@ export function InfoNodos({
     );
   }
 
-  const { status, signal, bateria, time } = ultima_metrica;
+  const { status, signal, bateria, time, temperatura, humedad } = ultima_metrica;
   const { label: signalLabel, color: signalColor } = getSignalLabel(signal);
   const dbm = getSignalDbm(signal);
   const bateriaColor = getBateriaColor(bateria);
@@ -68,6 +72,19 @@ export function InfoNodos({
 
   // Tiempo restante estimado (tiempo actual sobre 30h de batería como referencia)
   const tiempoRestante = time;
+
+  // Helpers de sensores ambientales
+  const tempColor =
+    temperatura == null ? '#94a3b8'
+      : temperatura >= 30 || temperatura <= 5 ? '#dc2626'
+      : temperatura >= 25 || temperatura <= 10 ? '#ca8a04'
+      : '#16a34a';
+
+  const humColor =
+    humedad == null ? '#94a3b8'
+      : humedad >= 85 || humedad <= 30 ? '#dc2626'
+      : humedad >= 70 || humedad <= 40 ? '#ca8a04'
+      : '#16a34a';
 
   return (
     <TouchableOpacity
@@ -84,7 +101,10 @@ export function InfoNodos({
         borderWidth: 1,
         borderColor: '#f1f5f9',
       }}
-      onPress={() => router.push({ pathname: '/Nodos/InformacionNodo', params: { nodoId: name } })}>
+      onPress={() => router.push({
+        pathname: '/Nodos/InformacionNodo',
+        params: { nodoId: name, deviceId: device_id ?? '' },
+      })}>
       {/* Header */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -104,7 +124,7 @@ export function InfoNodos({
               {name}
             </Text>
             <Text style={{ fontSize: 12, color: '#94a3b8', marginTop: 1 }}>
-              ID-00{ultima_metrica ? 1 : 0}
+              {device_id ? `Device ${device_id}` : `ID-00${ultima_metrica ? 1 : 0}`}
             </Text>
           </View>
         </View>
@@ -149,9 +169,30 @@ export function InfoNodos({
           </Text>
         </View>
 
-        {/* Tiempo restante */}
+        {/* Temperatura */}
         <View style={{ alignItems: 'center' }}>
-          <Text style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>Tiempo{'\n'}Restante</Text>
+          <Text style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>Temp.</Text>
+          <Text style={{ fontSize: 13, fontWeight: '600', color: tempColor }}>
+            {temperatura == null ? '—' : `${temperatura.toFixed(1)}°C`}
+          </Text>
+        </View>
+
+        {/* Humedad */}
+        <View style={{ alignItems: 'center' }}>
+          <Text style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>Humedad</Text>
+          <Text style={{ fontSize: 13, fontWeight: '600', color: humColor }}>
+            {humedad == null ? '—' : `${humedad.toFixed(0)}%`}
+          </Text>
+        </View>
+
+      </View>
+
+      {/* Segunda fila: Tiempo + Ubicación */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+
+        {/* Tiempo restante */}
+        <View>
+          <Text style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>Tiempo restante</Text>
           <Text style={{ fontSize: 13, fontWeight: '700', color: '#059669' }}>
             {tiempoRestante}h
           </Text>
