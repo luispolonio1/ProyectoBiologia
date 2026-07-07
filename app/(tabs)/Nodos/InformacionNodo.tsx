@@ -9,10 +9,10 @@ import {
   Text,
   View,
 } from "react-native";
-import { sendMotorCommand } from "../../../lib/api";
-import type { CommandResult, MotorAction } from "../../../type/motor";
 import type { Metrica, Red } from "../../../interface/Nodos";
+import { sendMotorCommand } from "../../../lib/api";
 import { ENDPOINTS } from "../../../lib/config";
+import type { CommandResult, MotorAction } from "../../../type/motor";
 
 interface ActionConfig {
   key: MotorAction;

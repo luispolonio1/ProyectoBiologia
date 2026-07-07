@@ -82,38 +82,6 @@ export default function TabLayout() {
           
         }}
       />
-
-      <Tabs.Screen
-        name="Estadisticas/Estadisticas"
-        options={{
-          title: 'Estadisticas',
-
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons
-              name="bar-chart"
-              size={size}
-              color={color}
-            />
-          ),
-          
-        }}
-      />
-
-      <Tabs.Screen
-        name="Configuraciones/setting"
-        options={{
-          title: 'Configuraciones',
-
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons
-              name="settings"
-              size={size}
-              color={color}
-            />
-          ),
-          
-        }}
-      />
     </Tabs>
       <Toast />
     </RedProvider>
