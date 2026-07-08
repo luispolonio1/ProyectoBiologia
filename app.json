@@ -4,7 +4,7 @@
     "slug": "ProyectoBiologia",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/iconApp.png",
     "scheme": "proyectobiologia",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -14,9 +14,9 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundImage": "./assets/images/icon.png",
-        "monochromeImage": "./assets/images/icon.png"
+        "foregroundImage": "./assets/images/iconApp.png",
+        "backgroundImage": "./assets/images/iconApp.png",
+        "monochromeImage": "./assets/images/iconApp.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -24,7 +24,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/icon.png",
+      "favicon": "./assets/images/iconApp.png",
       "bundler": "metro"
     },
     "plugins": [
@@ -32,7 +32,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/icon.png",
+          "image": "./assets/images/iconApp.png",
           "imageWidth": 150,
           "resizeMode": "contain",
           "backgroundColor": "#3179ad",

@@ -24,6 +24,7 @@ const ACTIONS: readonly ActionConfig[] = [
   { key: "FORWARD",  label: "Subir",  color: "bg-emerald-500" },
   { key: "BACKWARD", label: "Bajar",     color: "bg-amber-500"   },
   { key: "LEFT",     label: "Encender", color: "bg-sky-500"     },
+  { key: "STOP",     label: "Detener", color: "bg-rose-500"     },
 ] as const;
 
 // ⚠️ Misma constante que el resto del proyecto — centralizada en lib/config.ts
